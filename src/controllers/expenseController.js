@@ -63,8 +63,18 @@ const expenseController = {
         message: 'Error fetching expenses'
       });
     }
-  }
+  },
+  summary: async (req, res) => {
+    try {
+      const { groupId } = req.params;
+      const summary = await expenseDao.getExpenseSummary(groupId);
 
+      res.status(200).json(summary);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching expense summary" });
+    }
+  }
 };
 
 module.exports = expenseController;

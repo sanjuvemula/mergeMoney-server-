@@ -8,7 +8,7 @@ const expenseSchema = new mongoose.Schema({
     },
     title:{type:String, required: true},
     description: { type: String, required: false },
-    amount: {type: Number, required:true},
+    totalAmount: {type: Number, required:true},
     split: [
         {
             email: {type: String, required: true},
