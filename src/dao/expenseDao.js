@@ -1,4 +1,5 @@
 const Expense = require('../model/expense.js');
+const Group = require("../model/group");
 
 const expenseDao = {
     createExpense: async (data) => {
@@ -20,20 +21,32 @@ const expenseDao = {
     getExpensesById: async (groupId) => {
         return await Expense.find({ groupId: groupId });
     },
-
     getExpenseSummary: async (groupId) => {
-        const expenses = await Expense.find({ groupId });
-        const balanceMap = {};
-        expenses.forEach((expense) => {
-            const { paidBy, totalAmount, split } = expense;
-            balanceMap[paidBy] = (balanceMap[paidBy] || 0) + totalAmount;
-            split.forEach((member) => {
-                balanceMap[member.email] =
-                    (balanceMap[member.email] || 0) - member.amount;
-            });
+    const group = await Group.findById(groupId);
+    if (!group) return {};
+    const lastSettledDate = group.paymentStatus?.isPaid
+        ? group.paymentStatus.date: null;
+    let expenses;
+    if (lastSettledDate) {
+        expenses = await Expense.find({
+            groupId,
+            createdAt: { $gt: lastSettledDate }
         });
-
-        return balanceMap;
+    } else {
+        expenses = await Expense.find({ groupId });
     }
+    const balanceMap = {};
+    expenses.forEach((expense) => {
+        const { paidBy, totalAmount, split } = expense;
+        balanceMap[paidBy] =
+            (balanceMap[paidBy] || 0) + totalAmount;
+        split.forEach((member) => {
+            balanceMap[member.email] =
+                (balanceMap[member.email] || 0) - member.amount;
+        });
+    });
+    return balanceMap;
+}
+
 };
 module.exports = expenseDao;
