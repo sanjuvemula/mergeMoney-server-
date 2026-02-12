@@ -88,7 +88,37 @@ const groupController = {
             response.status(500).json({ message: "Error filtering groups" });
         }
     },
-
+    getById: async (request, response) => {
+        try {
+            const { groupId } = request.params;
+            const group = await groupDao.getGroupById(groupId);
+            if (!group) {
+                return response.status(404).json({ message: "Group not found" });
+            }
+            response.status(200).json(group);
+        } catch (error) {
+            console.error(error);
+            response.status(500).json({ message: "Error fetching group" });
+        }
+    },
+    settleGroup: async (request, response) => {
+        try {
+            const { groupId } = request.params;
+            const updatedGroup = await groupDao.updateGroup({
+                groupId: groupId,
+                paymentStatus: {
+                    amount: 0,
+                    currency: 'INR',
+                    date: Date.now(),
+                    isPaid: true
+                }
+            });
+            response.status(200).json(updatedGroup);
+        } catch (error) {
+            console.error(error);
+            response.status(500).json({ message: "Error settling group" });
+        }
+    },
     getAudit: async (request, response) => {
         try {
             const { groupId } = request.params;

@@ -11,19 +11,19 @@ const groupDao = {
 
         return await Group.findByIdAndUpdate(groupId, {
             name, description, thumbnail, adminEmail, paymentStatus,
-        }, { new: true });
+        }, { returnDocument: 'after' });
     },
 
     addMembers: async (groupId, ...membersEmails) => {
         return await Group.findByIdAndUpdate(groupId, {
-            $addToSet: { membersEmail: { $each: membersEmails }}
-        }, { new: true });
+            $addToSet: { membersEmail: { $each: membersEmails } }
+        }, { returnDocument: 'after' });
     },
 
     removeMembers: async (groupId, ...membersEmails) => {
         return await Group.findByIdAndUpdate(groupId, {
             $pull: { membersEmail: { $in: membersEmails } }
-        }, { new: true });
+        }, { returnDocument: 'after' });
     },
 
     getGroupByEmail: async (email) => {
@@ -35,7 +35,9 @@ const groupDao = {
         // Check in membersEmail field.
         return await Group.find({ "paymentStatus.isPaid": status });
     },
-
+    getGroupById: async (groupId) => {
+        return await Group.findById(groupId);
+    },
     /**
      * We'll only return when was the last time group
      * was settled to begin with.

@@ -1,10 +1,19 @@
 const expenseDao = require('../dao/expenseDao');
+const groupDao = require("../dao/groupDao");
 
 const expenseController = {
-
   create: async (req, res) => {
     try {
       const expense = await expenseDao.createExpense(req.body);
+      await groupDao.updateGroup({
+      groupId: req.body.groupId,
+      paymentStatus: {
+        amount: 0,
+        currency: "INR",
+        date: Date.now(),
+        isPaid: false
+      }
+    });
       res.status(201).json({
         message: 'Expense created successfully',
         expenseId: expense._id

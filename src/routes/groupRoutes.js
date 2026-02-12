@@ -10,8 +10,10 @@ router.post('/create', groupController.create);
 router.put('/update', groupController.update);
 router.patch('/members/add', groupController.addMembers);
 router.patch('/members/remove', groupController.removeMembers);
+router.patch('/settle/:groupId', groupController.settleGroup);
 router.get('/my-groups', groupController.getGroupsByUser);
 router.get('/status', groupController.getGroupsByPaymentStatus);
 router.get('/:groupId/audit', groupController.getAudit);
+router.get('/:groupId', groupController.getById);
 
 module.exports = router;
